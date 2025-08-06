@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Yokshitha's Fun Math Game</title>
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      padding: 30px;
+    }
+    h1 {
+      color: #4CAF50;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 18px;
+      cursor: pointer;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+      border-radius: 10px;
+    }
+    .question {
+      font-size: 24px;
+      margin: 20px;
+    }
+    .answers button {
+      background-color: #2196F3;
+    }
+    .animate {
+      animation: fly 1s ease-out;
+    }
+    @keyframes fly {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-50px); opacity: 0; }
+    }
+    .emoji {
+      font-size: 50px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎲 Yokshitha's Learning Game 🎲</h1>
+
+  <button onclick="startGame('addition')">➕ Addition</button>
+  <button onclick="startGame('subtraction')">➖ Subtraction</button>
+  <button onclick="startMissingNumber()">❓ Missing Number</button>
+  <button onclick="startWordGame()">🔤 Missing Letters</button>
+
+  <div class="question" id="questionBox"></div>
+  <div class="answers" id="answers"></div>
+  <div class="emoji" id="emoji"></div>
+
+  <script>
+    const words = ["apple", "pencil", "elephant", "monkey", "orange"];
+
+    function speak(text) {
+      const speech = new SpeechSynthesisUtterance(text);
+      speech.lang = "en-US";
+      speechSynthesis.speak(speech);
+    }
+
+    function animateSuccess() {
+      const emoji = document.getElementById("emoji");
+      emoji.innerHTML = "✏️ ✏️ ✏️";
+      emoji.classList.add("animate");
+      speak("Yokshitha, good good good!");
+      setTimeout(() => {
+        emoji.classList.remove("animate");
+        emoji.innerHTML = "";
+      }, 1000);
+    }
+
+    function startGame(type) {
+      const num1 = Math.floor(Math.random() * 10) + 1;
+      const num2 = Math.floor(Math.random() * 10) + 1;
+      const questionBox = document.getElementById("questionBox");
+      const answersBox = document.getElementById("answers");
+
+      let correctAnswer = type === 'addition' ? num1 + num2 : num1 - num2;
+      let question = `${num1} ${type === 'addition' ? '+' : '-'} ${num2} = ?`;
+
+      questionBox.innerText = question;
+      answersBox.innerHTML = "";
+
+      const correctIndex = Math.floor(Math.random() * 4);
+      for (let i = 0; i < 4; i++) {
+        const btn = document.createElement("button");
+        let value = correctAnswer + (i - correctIndex);
+        btn.innerText = value;
+        btn.onclick = () => {
+          if (value === correctAnswer) {
+            animateSuccess();
+          } else {
+            speak("Try again");
+          }
+        };
+        answersBox.appendChild(btn);
+      }
+    }
+
+    function startMissingNumber() {
+      const a = Math.floor(Math.random() * 10) + 1;
+      const b = Math.floor(Math.random() * 10) + 1;
+      const result = a + b;
+      const hide = Math.random() > 0.5 ? 'a' : 'b';
+
+      let question = hide === 'a' ? `? + ${b} = ${result}` : `${a} + ? = ${result}`;
+      let correct = hide === 'a' ? a : b;
+
+      const questionBox = document.getElementById("questionBox");
+      const answersBox = document.getElementById("answers");
+      questionBox.innerText = question;
+      answersBox.innerHTML = "";
+
+      const correctIndex = Math.floor(Math.random() * 4);
+      for (let i = 0; i < 4; i++) {
+        const value = correct + (i - correctIndex);
+        const btn = document.createElement("button");
+        btn.innerText = value;
+        btn.onclick = () => {
+          if (value === correct) {
+            animateSuccess();
+          } else {
+            speak("Oops, wrong answer.");
+          }
+        };
+        answersBox.appendChild(btn);
+      }
+    }
+
+    function startWordGame() {
+      const word = words[Math.floor(Math.random() * words.length)];
+      const index = Math.floor(Math.random() * word.length);
+      const missingLetter = word[index];
+      const display = word.slice(0, index) + "_" + word.slice(index + 1);
+
+      const questionBox = document.getElementById("questionBox");
+      const answersBox = document.getElementById("answers");
+
+      questionBox.innerText = `Complete the word: ${display}`;
+      answersBox.innerHTML = "";
+
+      const options = [missingLetter];
+      while (options.length < 4) {
+        const letter = String.fromCharCode(97 + Math.floor(Math.random() * 26));
+        if (!options.includes(letter)) options.push(letter);
+      }
+
+      options.sort(() => Math.random() - 0.5);
+      options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.innerText = opt;
+        btn.onclick = () => {
+          if (opt === missingLetter) {
+            animateSuccess();
+          } else {
+            speak("Wrong letter");
+          }
+        };
+        answersBox.appendChild(btn);
+      });
+    }
+  </script>
+
+</body>
+</html>
