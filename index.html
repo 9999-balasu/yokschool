@@ -9,6 +9,7 @@
       font-family: Arial;
       text-align: center;
       padding: 30px;
+      background-color: #fdf6e3;
     }
     h1 {
       color: #4CAF50;
@@ -41,6 +42,23 @@
       font-size: 50px;
       margin-top: 20px;
     }
+    .items {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 20px;
+    }
+    .item {
+      width: 50px;
+      height: 50px;
+      margin: 10px;
+      background-color: red;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .item.removed {
+      background-color: lightgray;
+    }
   </style>
 </head>
 <body>
@@ -51,10 +69,14 @@
   <button onclick="startGame('subtraction')">➖ Subtraction</button>
   <button onclick="startMissingNumber()">❓ Missing Number</button>
   <button onclick="startWordGame()">🔤 Missing Letters</button>
+  <button onclick="startColorSubtraction()">🎨 Subtract with Colors</button>
 
   <div class="question" id="questionBox"></div>
   <div class="answers" id="answers"></div>
+  <div id="colorGameContainer"></div>
   <div class="emoji" id="emoji"></div>
+
+  <audio id="correctSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
 
   <script>
     const words = ["apple", "pencil", "elephant", "monkey", "orange"];
@@ -70,6 +92,7 @@
       emoji.innerHTML = "✏️ ✏️ ✏️";
       emoji.classList.add("animate");
       speak("Yokshitha, good good good!");
+      document.getElementById("correctSound").play();
       setTimeout(() => {
         emoji.classList.remove("animate");
         emoji.innerHTML = "";
@@ -77,6 +100,7 @@
     }
 
     function startGame(type) {
+      hideColorGame(); // Hide diagram game
       const num1 = Math.floor(Math.random() * 10) + 1;
       const num2 = Math.floor(Math.random() * 10) + 1;
       const questionBox = document.getElementById("questionBox");
@@ -105,6 +129,7 @@
     }
 
     function startMissingNumber() {
+      hideColorGame();
       const a = Math.floor(Math.random() * 10) + 1;
       const b = Math.floor(Math.random() * 10) + 1;
       const result = a + b;
@@ -135,6 +160,7 @@
     }
 
     function startWordGame() {
+      hideColorGame();
       const word = words[Math.floor(Math.random() * words.length)];
       const index = Math.floor(Math.random() * word.length);
       const missingLetter = word[index];
@@ -166,7 +192,43 @@
         answersBox.appendChild(btn);
       });
     }
+
+    function hideColorGame() {
+      document.getElementById("colorGameContainer").innerHTML = "";
+    }
+
+    function startColorSubtraction() {
+      document.getElementById("questionBox").innerText = "";
+      document.getElementById("answers").innerHTML = "";
+      const container = document.getElementById("colorGameContainer");
+      container.innerHTML = "";
+
+      const total = Math.floor(Math.random() * 6) + 5;
+      const removeCount = Math.floor(Math.random() * total);
+      const question = document.createElement("p");
+      question.innerText = `Click to remove ${removeCount} out of ${total} dots`;
+      container.appendChild(question);
+
+      const itemsDiv = document.createElement("div");
+      itemsDiv.className = "items";
+      container.appendChild(itemsDiv);
+
+      for (let i = 0; i < total; i++) {
+        const dot = document.createElement("div");
+        dot.className = "item";
+        dot.onclick = () => {
+          if (!dot.classList.contains("removed") && itemsDiv.querySelectorAll(".removed").length < removeCount) {
+            dot.classList.add("removed");
+            if (itemsDiv.querySelectorAll(".removed").length === removeCount) {
+              animateSuccess();
+            }
+          }
+        };
+        itemsDiv.appendChild(dot);
+      }
+    }
   </script>
 
 </body>
 </html>
+
